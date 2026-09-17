@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Профиль — Anime Hub</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-page="profile">
+    <header class="site-header">
+      <a class="logo" href="index.html">Anime<span>Hub</span></a>
+      <nav class="nav">
+        <a href="index.html">Каталог</a
+        ><a class="active" href="profile.html">Профиль</a
+        ><a href="admin.html">Админ</a
+        ><button id="logout" class="nav-button">Выйти</button>
+      </nav>
+      <button class="menu-toggle">☰</button>
+    </header>
+    <main class="container profile-page">
+      <div class="profile-hero">
+        <div>
+          <p class="eyebrow">YOUR SPACE</p>
+          <h1>Личный<br /><em>архив.</em></h1>
+        </div>
+        <div class="profile-number">05</div>
+      </div>
+      <section class="profile-layout">
+        <aside class="profile-card" id="profile">
+          <div class="loading-line"></div>
+        </aside>
+        <section class="favorites-section"><p id="profileMessage" role="status" class="muted"></p>
+          <div class="section-kicker">
+            <span>01</span><span>SAVED STORIES</span>
+          </div>
+          <div id="favorites" class="favorites-list">
+            <p class="muted">Загружаем избранное…</p>
+          </div>
+          <section class="history-section">
+            <div class="section-kicker">
+              <span>02</span><span>VIEW HISTORY</span>
+            </div>
+            <div id="history" class="history-list">
+              <p class="muted">Загрузка истории...</p>
+            </div>
+          </section>
+          <section class="history-section"><div class="section-kicker"><span>03</span><span>MY REVIEWS</span></div><div id="myReviews"><p class="muted">Загрузка отзывов…</p></div></section>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="js/profile.js"></script>
+    <script type="module" src="js/ui.js"></script>
+  </body>
+</html>

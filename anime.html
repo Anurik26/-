@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Anime — Anime Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body data-page="anime">
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    <header class="site-header"><a class="logo" href="index.html">Anime<span>Hub</span></a>
+        <nav class="nav"><a href="index.html">Каталог</a><a href="profile.html">Профиль</a><a
+                href="admin.html">Админ</a><a href="login.html">Войти</a></nav><button class="menu-toggle">☰</button>
+    </header>
+    <main class="container detail-page"><a class="back-link" href="index.html">← Вернуться в каталог</a>
+        <div id="animeDetails">
+            <div class="detail-skeleton"></div>
+        </div>
+        <section class="reviews-section">
+    <div class="reviews-head">
+        <span class="eyebrow">02 / REVIEWS</span>
+        <h2>Отзывы</h2>
+    </div>
+
+    <form id="review-form" class="review-form">
+        <label for="review-rating">Ваша оценка</label>
+
+        <select id="review-rating" required>
+            <option value="">Выберите оценку</option>
+            <option value="10">10 — Шедевр</option>
+            <option value="9">9 — Отлично</option>
+            <option value="8">8 — Очень хорошо</option>
+            <option value="7">7 — Хорошо</option>
+            <option value="6">6 — Нормально</option>
+            <option value="5">5 — Средне</option>
+            <option value="4">4 — Слабо</option>
+            <option value="3">3 — Плохо</option>
+            <option value="2">2 — Очень плохо</option>
+            <option value="1">1 — Ужасно</option>
+        </select>
+
+        <label for="review-text">Ваш отзыв</label>
+
+        <textarea
+            id="review-text" maxlength="3000"
+            placeholder="Что думаете об этом аниме?"
+            required
+        ></textarea>
+
+        <button type="submit" class="button">
+            ОПУБЛИКОВАТЬ ОТЗЫВ
+        </button>
+
+        <p id="review-message" role="status" aria-live="polite"></p>
+    </form>
+
+    <div id="reviews-list" class="reviews-list">
+        <p>Загрузка отзывов...</p>
+    </div>
+</section>
+    </main>
+    <script type="module" src="js/anime.js"></script>
+    <script type="module" src="js/ui.js"></script>
+</body>
+
+</html>

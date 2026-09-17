@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owns(data) { return signedIn() && data.userId == request.auth.uid; }
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function validAnime(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 160 &&
+        data.description is string && data.description.size() > 0 && data.description.size() <= 10000 &&
+        data.poster is string && data.poster.size() <= 2000 &&
+        data.year is int && data.year >= 1900 && data.year <= 2100 &&
+        data.episodes is int && data.episodes >= 0 && data.episodes <= 100000 &&
+        data.rating is number && data.rating >= 0 && data.rating <= 10 &&
+        data.ratingCount is int && data.ratingCount >= 0 && data.ratingCount <= 100000000 &&
+        data.status in ['Finished', 'Ongoing', 'Announced'] &&
+        data.genres is list && data.genres.size() <= 20;
+    }
+    function validReview(data) {
+      return data.userId is string && data.animeId is string &&
+        data.userName is string && data.userName.size() <= 80 &&
+        data.rating is int && data.rating >= 1 && data.rating <= 10 &&
+        data.text is string && data.text.size() > 0 && data.text.size() <= 3000 &&
+        data.createdAt is timestamp;
+    }
+    function validFavorite(data) {
+      return data.userId is string && data.animeId is string &&
+        data.createdAt is timestamp && exists(/databases/$(database)/documents/anime/$(data.animeId));
+    }
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if signedIn() && request.auth.uid == userId &&
+        request.resource.data.keys().hasOnly(['name', 'email', 'role', 'createdAt']) &&
+        request.resource.data.role == 'user' && request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80 &&
+        request.resource.data.email == request.auth.token.email && request.resource.data.createdAt == request.time;
+      allow update: if signedIn() && request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80 &&
+        request.resource.data.role in ['user', 'admin'] && (
+          (request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name'])) ||
+          (isAdmin() && request.auth.uid != userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'role']))
+        );
+      allow delete: if isAdmin() && request.auth.uid != userId;
+    }
+    match /anime/{animeId} {
+      allow read: if true;
+      allow create: if isAdmin() && validAnime(request.resource.data) && request.resource.data.createdAt == request.time;
+      allow update: if isAdmin() && validAnime(request.resource.data) && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isAdmin();
+    }
+    match /favorites/{favoriteId} {
+      allow read: if owns(resource.data) || isAdmin();
+      allow create: if owns(request.resource.data) && validFavorite(request.resource.data) && request.resource.data.createdAt == request.time;
+      allow update: if owns(resource.data) && owns(request.resource.data) &&
+        request.resource.data.animeId == resource.data.animeId && validFavorite(request.resource.data);
+      allow delete: if owns(resource.data) || isAdmin();
+    }
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if owns(request.resource.data) && validReview(request.resource.data) &&
+        request.resource.data.createdAt == request.time && exists(/databases/$(database)/documents/anime/$(request.resource.data.animeId));
+      allow update: if (owns(resource.data) || isAdmin()) && validReview(request.resource.data) &&
+        request.resource.data.userId == resource.data.userId && request.resource.data.animeId == resource.data.animeId &&
+        request.resource.data.createdAt == request.time;
+      allow delete: if owns(resource.data) || isAdmin();
+    }
+    match /history/{historyId} {
+      allow read: if owns(resource.data) || isAdmin();
+      allow create: if owns(request.resource.data) && request.resource.data.action == 'view' &&
+        request.resource.data.animeId is string && request.resource.data.animeTitle is string &&
+        request.resource.data.animeTitle.size() <= 160 && request.resource.data.createdAt == request.time &&
+        exists(/databases/$(database)/documents/anime/$(request.resource.data.animeId));
+      allow delete: if owns(resource.data) || isAdmin();
+    }
+  }
+}

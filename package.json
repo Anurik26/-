@@ -1,0 +1,1 @@
+{"name":"anime-hub","private":true,"type":"module","scripts":{"start":"node serve.mjs","test":"node tests/common.test.mjs","test:rules":"firebase emulators:exec --only firestore --project demo-anime-hub \"node tests/firestore.test.mjs\""},"devDependencies":{"@firebase/rules-unit-testing":"5.0.2","firebase":"12.19.0","firebase-tools":"15.30.1"}}
