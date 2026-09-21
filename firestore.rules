@@ -3,6 +3,13 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function owns(data) { return signedIn() && data.userId == request.auth.uid; }
+    function knownAnime(id) {
+      return exists(/databases/$(database)/documents/anime/$(id)) || id in [
+        'death-note','fullmetal-alchemist-brotherhood','demon-slayer','jujutsu-kaisen',
+        'one-punch-man','spy-x-family','frieren','vinland-saga','violet-evergarden',
+        'your-name','haikyuu','mob-psycho-100','chainsaw-man','steins-gate','cowboy-bebop'
+      ];
+    }
     function isAdmin() {
       return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
@@ -27,7 +34,7 @@ service cloud.firestore {
     }
     function validFavorite(data) {
       return data.userId is string && data.animeId is string &&
-        data.createdAt is timestamp && exists(/databases/$(database)/documents/anime/$(data.animeId));
+        data.createdAt is timestamp && knownAnime(data.animeId);
     }
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
@@ -60,7 +67,7 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if owns(request.resource.data) && validReview(request.resource.data) &&
-        request.resource.data.createdAt == request.time && exists(/databases/$(database)/documents/anime/$(request.resource.data.animeId));
+        request.resource.data.createdAt == request.time && knownAnime(request.resource.data.animeId);
       allow update: if (owns(resource.data) || isAdmin()) && validReview(request.resource.data) &&
         request.resource.data.userId == resource.data.userId && request.resource.data.animeId == resource.data.animeId &&
         request.resource.data.createdAt == request.time;
@@ -71,7 +78,7 @@ service cloud.firestore {
       allow create: if owns(request.resource.data) && request.resource.data.action == 'view' &&
         request.resource.data.animeId is string && request.resource.data.animeTitle is string &&
         request.resource.data.animeTitle.size() <= 160 && request.resource.data.createdAt == request.time &&
-        exists(/databases/$(database)/documents/anime/$(request.resource.data.animeId));
+        knownAnime(request.resource.data.animeId);
       allow delete: if owns(resource.data) || isAdmin();
     }
   }
