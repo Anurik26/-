@@ -1,6 +1,7 @@
 import {db} from './firebase.js';
 import {collection,query,orderBy,limit,onSnapshot} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 import {esc,posterUrl,rows,filterAnime,bindPosters} from './common.js';
+import {starterAnime} from './catalog.js';
 const grid=document.querySelector('#animeGrid'),more=document.querySelector('#loadMore'),search=document.querySelector('#searchInput'),genre=document.querySelector('#genreFilter'),sort=document.querySelector('#sortSelect'),featured=document.querySelector('#featuredAnime');
 const PAGE=10;let items=[],visible=PAGE,unsubscribe,request=0,loading=false,full=false,failed=false;
 const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');more.before(status);
@@ -15,7 +16,7 @@ function subscribe(){
  unsubscribe?.();const version=++request;full=Boolean(search.value.trim()||genre.value||sort.value!=='newest');loading=true;failed=false;more.disabled=true;status.textContent='Загрузка…';
  // Полный поиск по учебному каталогу; обычный просмотр ограничен размером страницы.
  const constraints=[orderBy('createdAt','desc')];if(!full)constraints.push(limit(visible+1));
- unsubscribe=onSnapshot(query(collection(db,'anime'),...constraints),snapshot=>{if(version!==request)return;items=rows(snapshot);loading=false;render();},error=>{
+ unsubscribe=onSnapshot(query(collection(db,'anime'),...constraints),snapshot=>{if(version!==request)return;const remote=rows(snapshot);items=[...remote,...starterAnime.filter(seed=>!remote.some(item=>item.id===seed.id))];loading=false;render();},error=>{
  if(version!==request)return;console.error(error);loading=false;failed=true;more.hidden=false;more.disabled=false;more.textContent='Повторить загрузку';status.textContent='Не удалось загрузить каталог.';if(!items.length){grid.innerHTML='<p class="empty-state">Проверьте соединение и повторите попытку.</p>';featured.innerHTML='';}
  });
 }

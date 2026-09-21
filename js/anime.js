@@ -3,6 +3,7 @@ import {doc,getDoc,collection,addDoc,setDoc,updateDoc,deleteDoc,query,where,getD
 import {onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import {ensureProfile} from './account.js';
 import {esc,posterUrl,rows,newest,reviewSummary,dateLabel,bindPosters,errorText} from './common.js';
+import {starterById} from './catalog.js';
 const params=new URLSearchParams(location.search),id=params.get('id');
 const box=document.querySelector('#animeDetails'),form=document.querySelector('#review-form'),rating=document.querySelector('#review-rating'),text=document.querySelector('#review-text'),message=document.querySelector('#review-message'),list=document.querySelector('#reviews-list');
 let anime=null,user=null,role='user',reviews=[],editing=null,version=0,unsubscribe;
@@ -39,8 +40,8 @@ async function load(currentUser){
  if(!id||id.includes('/')){box.innerHTML='<p class="muted">Аниме не найдено.</p>';list.innerHTML='';return;}
  try{
   const snap=await getDoc(doc(db,'anime',id));if(token!==version)return;
-  if(!snap.exists()){anime=null;box.innerHTML='<p class="muted">Аниме удалено или не существует.</p>';list.innerHTML='';return;}
-  anime=snap.data();document.title=`${anime.title} — Anime Hub`;renderDetails();void setupFavorite(currentUser,token);
+  if(!snap.exists()&&!starterById(id)){anime=null;box.innerHTML='<p class="muted">Аниме удалено или не существует.</p>';list.innerHTML='';return;}
+  anime=snap.exists()?snap.data():starterById(id);document.title=`${anime.title} — Anime Hub`;renderDetails();void setupFavorite(currentUser,token);
   form.querySelectorAll('input,textarea,select,button').forEach(el=>el.disabled=!currentUser);
   message.textContent=currentUser?'':'Войдите в аккаунт, чтобы оставить отзыв.';
   if(currentUser){

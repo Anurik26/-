@@ -3,10 +3,11 @@ import {onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/12.
 import {doc,collection,query,where,onSnapshot,deleteDoc,getDoc} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 import {ensureProfile} from './account.js';
 import {esc,posterUrl,rows,newest,uniqueBy,dateLabel,bindPosters,errorText} from './common.js';
+import {starterById} from './catalog.js';
 const profile=document.querySelector('#profile'),favorites=document.querySelector('#favorites'),history=document.querySelector('#history'),ownReviews=document.querySelector('#myReviews'),notice=document.querySelector('#profileMessage');
 let stops=[],favoriteDocs=[],version=0,revision=0;
 const cache=new Map();
-async function animeInfo(id){if(!id||id.includes('/'))return null;if(!cache.has(id))cache.set(id,getDoc(doc(db,'anime',id)).then(s=>s.exists()?s.data():null).catch(()=>null));return cache.get(id);}
+async function animeInfo(id){if(!id||id.includes('/'))return null;if(!cache.has(id))cache.set(id,getDoc(doc(db,'anime',id)).then(s=>s.exists()?s.data():starterById(id)||null).catch(()=>starterById(id)||null));return cache.get(id);}
 onAuthStateChanged(auth,async user=>{
  stops.forEach(stop=>stop());stops=[];const token=++version;
  if(!user){location.href='login.html';return;}
