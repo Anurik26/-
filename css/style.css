@@ -1499,4 +1499,34 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 }
 
 .logo { color: var(--ink); }
+
+/* More readable labels and body copy without losing the dark editorial style. */
+:root { --muted: #c0bcc7; --line: rgba(255,255,255,.18); }
+.nav a, .nav-button, .header-back,
+.hero-lead, .featured-content p, .catalog-head > p,
+.anime-card p, .card-meta, .muted,
+.detail-description, .review-card p,
+.favorite-row p, .history-row p { color: #c5c1ca; }
+.section-kicker span:first-child, .featured-content .index,
+.hero-no, .hero-scroll { color: #aaa5b1; }
+.hero h1 em, .catalog h2 em, .manifesto h2 em, .detail h1 em,
+.profile-hero h1 em, .admin-hero h1 em, .auth-visual h1 em {
+  color: #ddd6e8;
+  -webkit-text-stroke: 0;
+}
+.anime-card p { font-size: 14px; line-height: 1.65; min-height: 69px; }
+.badge { font-size: 11px; color: #dbcaff; }
+.card-meta { font-size: 13px; }
+.toolbar input::placeholder, .auth-card input::placeholder { color: #aaa5b1; opacity: 1; }
+.toolbar input, .toolbar select, .admin-form input, .admin-form select,
+.admin-form textarea, .auth-card input { font-size: 16px; }
+.anime-card, .featured, .review-card, .favorite-row, .history-row { background-color: #121219; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible { outline: 3px solid #d7c2ff; outline-offset: 3px; }
+@media (max-width: 700px) {
+  .nav a, .nav-button { font-size: 16px; }
+  .hero-lead, .featured-content p, .catalog-head > p { font-size: 16px; }
+  .anime-card p { min-height: auto; }
+  .eyebrow, .section-kicker { font-size: 12px; letter-spacing: 2.5px; }
+}
 .favorites-list > .empty-state, .history-list > .empty-state { margin: 0; padding: 20px; background: #0e0e13; }
