@@ -7,6 +7,7 @@ import {starterById} from './catalog.js';
 const profile=document.querySelector('#profile'),favorites=document.querySelector('#favorites'),history=document.querySelector('#history'),ownReviews=document.querySelector('#myReviews'),notice=document.querySelector('#profileMessage');
 let stops=[],favoriteDocs=[],version=0,revision=0;
 const cache=new Map();
+if(new URLSearchParams(location.search).get('verify')==='1')notice.textContent='Мы отправили письмо для подтверждения адреса. Проверьте входящие и папку «Спам».';
 async function animeInfo(id){if(!id||id.includes('/'))return null;if(!cache.has(id))cache.set(id,getDoc(doc(db,'anime',id)).then(s=>s.exists()?s.data():starterById(id)||null).catch(()=>starterById(id)||null));return cache.get(id);}
 onAuthStateChanged(auth,async user=>{
  stops.forEach(stop=>stop());stops=[];const token=++version;
@@ -21,10 +22,10 @@ onAuthStateChanged(auth,async user=>{
   if(token!==version||current!==revision)return;
   favorites.innerHTML=enriched.length?enriched.map(item=>{
    const a=item.current||{title:item.title||item.animeTitle,poster:item.poster||item.animePoster,year:item.year};
-   return `<article class="favorite-row"><img src="${esc(posterUrl(a.poster))}" alt="${esc(a.title)}"><div><h3>${esc(a.title||'Без названия')}</h3><p>${esc(a.year||'—')} · SAVED TO YOUR ARCHIVE</p></div><div class="row-actions"><a href="anime.html?id=${encodeURIComponent(item.animeId)}">OPEN ↗</a><button class="text-button" type="button" data-remove-favorite="${esc(item.animeId)}">Убрать</button></div></article>`;
+   return `<article class="favorite-row"><img src="${esc(posterUrl(a.poster))}" alt="${esc(a.title)}"><div><h3>${esc(a.title||'Без названия')}</h3><p>${esc(a.year||'—')} · СОХРАНЕНО В АРХИВ</p></div><div class="row-actions"><a href="anime.html?id=${encodeURIComponent(item.animeId)}">ОТКРЫТЬ ↗</a><button class="text-button" type="button" data-remove-favorite="${esc(item.animeId)}">Убрать</button></div></article>`;
   }).join(''):'<p class="muted empty-state">Пока ничего не сохранено. Добавьте аниме из каталога.</p>';bindPosters(favorites);
  });
- watch('history',history,items=>{const unique=uniqueBy(items,'animeId');history.innerHTML=unique.length?unique.map((item,i)=>`<article class="history-row"><div class="history-number">${String(i+1).padStart(2,'0')}</div><div><h3>${esc(item.animeTitle||'Без названия')}</h3><p>VIEWED / ${esc(dateLabel(item.createdAt))}</p></div><a href="anime.html?id=${encodeURIComponent(item.animeId)}">OPEN ↗</a></article>`).join(''):'<p class="muted empty-state">История просмотров пока пуста.</p>';});
+ watch('history',history,items=>{const unique=uniqueBy(items,'animeId');history.innerHTML=unique.length?unique.map((item,i)=>`<article class="history-row"><div class="history-number">${String(i+1).padStart(2,'0')}</div><div><h3>${esc(item.animeTitle||'Без названия')}</h3><p>ПРОСМОТРЕНО / ${esc(dateLabel(item.createdAt))}</p></div><a href="anime.html?id=${encodeURIComponent(item.animeId)}">ОТКРЫТЬ ↗</a></article>`).join(''):'<p class="muted empty-state">История просмотров пока пуста.</p>';});
  watch('reviews',ownReviews,items=>{ownReviews.innerHTML=items.length?items.map(item=>`<article class="review-card"><div class="review-card-head"><strong>${esc(item.animeTitle||'Отзыв об аниме')}</strong><span>⭐ ${esc(item.rating)}/10</span></div><p>${esc(item.text)}</p><div class="review-actions"><a href="anime.html?id=${encodeURIComponent(item.animeId)}&review=${encodeURIComponent(item.id)}">Изменить ↗</a><button type="button" class="text-button" data-remove-review="${esc(item.id)}">Удалить</button></div></article>`).join(''):'<p class="muted">Вы пока не оставили отзывов.</p>';});
 });
 favorites.addEventListener('click',async event=>{const button=event.target.closest('[data-remove-favorite]');if(!button||button.disabled)return;button.disabled=true;notice.textContent='';try{await Promise.all(favoriteDocs.filter(d=>d.animeId===button.dataset.removeFavorite).map(d=>deleteDoc(doc(db,'favorites',d.id))));}catch(error){notice.textContent=errorText(error);button.disabled=false;}});

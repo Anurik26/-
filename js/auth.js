@@ -1,5 +1,5 @@
 import {auth} from './firebase.js';
-import {createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updateProfile} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import {createUserWithEmailAndPassword,signInWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,updateProfile} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import {ensureProfile} from './account.js';
 const login=document.querySelector('#loginForm'), registration=document.querySelector('#registerForm'), message=document.querySelector('#message'), email=document.querySelector('#email'), password=document.querySelector('#password'), nameInput=document.querySelector('#name');
 let pendingRegistration=null;
@@ -18,7 +18,7 @@ registration?.addEventListener('submit',event=>{event.preventDefault();void subm
  const name=nameInput.value.trim(); if(!name||name.length>80){message.textContent='Введите имя от 1 до 80 символов.';return;}
  const enteredEmail=email.value.trim();
  if(!pendingRegistration||pendingRegistration.email!==enteredEmail)pendingRegistration=(await createUserWithEmailAndPassword(auth,enteredEmail,password.value)).user;
- await updateProfile(pendingRegistration,{displayName:name});await ensureProfile(pendingRegistration,name);location.href='profile.html';
+ await updateProfile(pendingRegistration,{displayName:name});await ensureProfile(pendingRegistration,name);auth.languageCode='ru';await sendEmailVerification(pendingRegistration);location.href='profile.html?verify=1';
 });});
 document.querySelector('#resetPassword')?.addEventListener('click',async event=>{
  if(!email.value.trim()||!email.checkValidity()){message.textContent='Введите корректный email в поле выше.';email.focus();return;}

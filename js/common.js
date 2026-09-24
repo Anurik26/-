@@ -19,6 +19,8 @@ export function reviewSummary(items) {
   return {count:votes.length,rating:votes.length?(votes.reduce((s,x)=>s+x.rating,0)/votes.length).toFixed(1):'—'};
 }
 export const dateLabel=value=>millis(value)?new Date(millis(value)).toLocaleDateString('ru-RU'):'Сейчас';
+export const statusLabel=value=>({Finished:'Завершён',Ongoing:'Выходит',Announced:'Анонсирован'})[value]||value||'Неизвестно';
+export const genreLabel=value=>({Action:'Экшен',Adventure:'Приключения',Comedy:'Комедия',Drama:'Драма',Fantasy:'Фэнтези',Romance:'Романтика'})[value]||value;
 export function bindPosters(root=document) { root.querySelectorAll('img').forEach(img=>img.addEventListener('error',()=>{img.src=fallback;},{once:true})); }
 export function errorText(error) {
   if(error?.code==='permission-denied')return 'Нет доступа к этому действию. Обновите страницу или войдите заново.';
