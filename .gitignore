@@ -3,3 +3,5 @@ node_modules/
 *-debug.log
 .env
 .env.*
+!.env.example
+js/firebase-config.js
