@@ -29,9 +29,13 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
         run: node scripts/generate-firebase-config.mjs
+      - name: Prepare site artifact
+        run: |
+          mkdir -p _site
+          rsync -a --exclude='.git' --exclude='.env' --exclude='_site' ./ _site/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
